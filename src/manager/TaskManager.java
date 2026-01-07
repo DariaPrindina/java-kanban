@@ -1,3 +1,10 @@
+package manager;
+
+import task.Epic;
+import task.Subtask;
+import task.Status;
+import task.Task;
+
 import java.util.HashMap;
 import java.util.ArrayList;
 
@@ -61,13 +68,11 @@ public class TaskManager {
         int id = generateId();
         epic.setId(id);
         epics.put(id, epic);
-        updateEpicStatus(epic);
     }
 
     public void updateEpic(Epic epic) {
         if (epics.containsKey(epic.getId())) {
             epics.put(epic.getId(), epic);
-            updateEpicStatus(epic);
         }
     }
 
