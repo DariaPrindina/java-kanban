@@ -10,13 +10,13 @@ class ManagersTest {
     void getDefaultReturnsInitializedTaskManager() {
         TaskManager manager = Managers.getDefault();
         assertNotNull(manager);
-        assertTrue(manager instanceof InMemoryTaskManager);
+        assertInstanceOf(InMemoryTaskManager.class, manager);
     }
 
     @Test
     void getDefaultHistoryReturnsInitializedHistoryManager() {
         HistoryManager history = Managers.getDefaultHistory();
         assertNotNull(history);
-        assertTrue(history instanceof InMemoryHistoryManager);
+        assertInstanceOf(InMemoryHistoryManager.class, history);
     }
 }
