@@ -10,12 +10,17 @@ public class Epic extends Task {
         super(name, description);
     }
 
+    public Epic(Epic other) {
+        super(other);
+        subtaskIds.addAll(other.subtaskIds);
+    }
+
     public List<Integer> getSubtaskIds() {
         return new ArrayList<>(subtaskIds);
     }
 
     public void addSubtaskId(int id) {
-        if (id != getId()) {
+        if (id != getId() && !subtaskIds.contains(id)) {
             subtaskIds.add(id);
         }
     }

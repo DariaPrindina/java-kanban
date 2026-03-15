@@ -27,7 +27,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void historyLimitedTo10Tasks() {
+    void historyShouldStoreMoreThanTenTasks() {
         for (int i = 1; i <= 15; i++) {
             Task task = new Task("Task" + i, "Desc" + i);
             task.setId(i);
@@ -36,9 +36,93 @@ class InMemoryHistoryManagerTest {
 
         List<Task> history = historyManager.getHistory();
 
-        assertEquals(10, history.size(), "История должна содержать ровно 10 задач");
-        assertEquals(6, history.get(0).getId(), "Первый элемент — 6-й");
-        assertEquals(15, history.get(9).getId(), "Последний элемент — 15-й");
+        assertEquals(15, history.size());
+        assertEquals(1, history.get(0).getId());
+        assertEquals(15, history.get(14).getId());
+    }
+
+    @Test
+    void shouldKeepOnlyLastViewOfTask() {
+        Task task1 = new Task("Task1", "Desc1");
+        task1.setId(1);
+        Task task2 = new Task("Task2", "Desc2");
+        task2.setId(2);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task1);
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size());
+        assertEquals(2, history.get(0).getId());
+        assertEquals(1, history.get(1).getId());
+    }
+
+    @Test
+    void shouldRemoveTaskFromHistoryById() {
+        Task task1 = new Task("Task1", "Desc1");
+        task1.setId(1);
+        Task task2 = new Task("Task2", "Desc2");
+        task2.setId(2);
+        Task task3 = new Task("Task3", "Desc3");
+        task3.setId(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(2);
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size());
+        assertEquals(1, history.get(0).getId());
+        assertEquals(3, history.get(1).getId());
+    }
+
+    @Test
+    void shouldRemoveFirstTaskFromHistory() {
+        Task task1 = new Task("Task1", "Desc1");
+        task1.setId(1);
+        Task task2 = new Task("Task2", "Desc2");
+        task2.setId(2);
+        Task task3 = new Task("Task3", "Desc3");
+        task3.setId(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(1);
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size());
+        assertEquals(2, history.get(0).getId());
+        assertEquals(3, history.get(1).getId());
+    }
+
+    @Test
+    void shouldRemoveLastTaskFromHistory() {
+        Task task1 = new Task("Task1", "Desc1");
+        task1.setId(1);
+        Task task2 = new Task("Task2", "Desc2");
+        task2.setId(2);
+        Task task3 = new Task("Task3", "Desc3");
+        task3.setId(3);
+
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(3);
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size());
+        assertEquals(1, history.get(0).getId());
+        assertEquals(2, history.get(1).getId());
     }
 
     @Test

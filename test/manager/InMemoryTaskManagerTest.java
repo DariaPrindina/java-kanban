@@ -86,6 +86,37 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void changingOriginalTaskAfterAddingShouldNotAffectManagerData() {
+        Task task = new Task("Task", "Desc");
+        manager.addTask(task);
+
+        task.setName("Changed");
+        task.setDescription("Changed desc");
+        task.setStatus(Status.DONE);
+
+        Task saved = manager.getTask(task.getId());
+
+        assertEquals("Task", saved.getName());
+        assertEquals("Desc", saved.getDescription());
+        assertEquals(Status.NEW, saved.getStatus());
+    }
+
+    @Test
+    void changingTaskAfterGettingShouldNotAffectManagerData() {
+        Task task = new Task("Task", "Desc");
+        manager.addTask(task);
+
+        Task saved = manager.getTask(task.getId());
+        saved.setName("Mutated");
+        saved.setStatus(Status.DONE);
+
+        Task updated = manager.getTask(task.getId());
+
+        assertEquals("Task", updated.getName());
+        assertEquals(Status.NEW, updated.getStatus());
+    }
+
+    @Test
     void historyContainsLastViewedTasks() {
         Task task1 = new Task("Task1", "Desc1");
         Task task2 = new Task("Task2", "Desc2");
@@ -108,17 +139,76 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void historyLimitedTo10Tasks() {
-        for (int i = 1; i <= 15; i++) {
-            Task task = new Task("Task" + i, "Desc" + i);
-            manager.addTask(task);
-            manager.getTask(task.getId());
-        }
+    void repeatedViewShouldKeepOnlyLastOccurrenceInHistory() {
+        Task task1 = new Task("Task1", "Desc1");
+        Task task2 = new Task("Task2", "Desc2");
+        manager.addTask(task1);
+        manager.addTask(task2);
+
+        manager.getTask(task1.getId());
+        manager.getTask(task2.getId());
+        manager.getTask(task1.getId());
 
         List<Task> history = manager.getHistory();
 
-        assertEquals(10, history.size(), "История должна содержать 10 задач");
-        assertEquals(6, history.get(0).getId());
-        assertEquals(15, history.get(9).getId());
+        assertEquals(2, history.size(), "В истории не должно быть дублей");
+        assertEquals(task2.getId(), history.get(0).getId());
+        assertEquals(task1.getId(), history.get(1).getId());
+    }
+
+    @Test
+    void deleteTaskShouldRemoveTaskFromHistory() {
+        Task task = new Task("Task", "Desc");
+        manager.addTask(task);
+
+        manager.getTask(task.getId());
+        manager.deleteTask(task.getId());
+
+        assertTrue(manager.getHistory().isEmpty(), "Удалённая задача должна исчезнуть из истории");
+    }
+
+    @Test
+    void deleteSubtaskShouldRemoveIdFromEpic() {
+        Epic epic = new Epic("Epic", "Desc");
+        manager.addEpic(epic);
+        Subtask subtask = new Subtask("Subtask", "Desc", epic.getId());
+        manager.addSubtask(subtask);
+
+        manager.deleteSubtask(subtask.getId());
+
+        Epic savedEpic = manager.getEpic(epic.getId());
+        assertTrue(savedEpic.getSubtaskIds().isEmpty(), "У эпика не должно оставаться старых id подзадач");
+    }
+
+    @Test
+    void deleteEpicShouldRemoveEpicAndSubtasksFromHistory() {
+        Epic epic = new Epic("Epic", "Desc");
+        manager.addEpic(epic);
+        Subtask subtask1 = new Subtask("Subtask1", "Desc1", epic.getId());
+        Subtask subtask2 = new Subtask("Subtask2", "Desc2", epic.getId());
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+
+        manager.getEpic(epic.getId());
+        manager.getSubtask(subtask1.getId());
+        manager.getSubtask(subtask2.getId());
+        manager.deleteEpic(epic.getId());
+
+        assertTrue(manager.getHistory().isEmpty(),
+                "После удаления эпика в истории не должно остаться ни эпика, ни его подзадач");
+    }
+
+    @Test
+    void deleteAllSubtasksShouldClearEpicSubtaskIds() {
+        Epic epic = new Epic("Epic", "Desc");
+        manager.addEpic(epic);
+        manager.addSubtask(new Subtask("Subtask1", "Desc1", epic.getId()));
+        manager.addSubtask(new Subtask("Subtask2", "Desc2", epic.getId()));
+
+        manager.deleteAllSubtasks();
+
+        Epic savedEpic = manager.getEpic(epic.getId());
+        assertTrue(savedEpic.getSubtaskIds().isEmpty(),
+                "После удаления всех подзадач у эпика не должно остаться неактуальных id");
     }
 }
