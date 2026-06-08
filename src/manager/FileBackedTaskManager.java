@@ -41,16 +41,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private String taskToString(Task task) {
         String epicId = "";
-        TaskType type;
-        if (task instanceof Subtask) {
-            type = TaskType.SUBTASK;
+        if (task.getType() == TaskType.SUBTASK) {
             epicId = String.valueOf(((Subtask) task).getEpicId());
-        } else if (task instanceof Epic) {
-            type = TaskType.EPIC;
-        } else {
-            type = TaskType.TASK;
         }
-        return task.getId() + "," + type + "," + task.getName() + "," +
+        return task.getId() + "," + task.getType() + "," + task.getName() + "," +
                 task.getStatus() + "," + task.getDescription() + "," + epicId;
     }
 
@@ -95,12 +89,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         for (int i = 1; i < lines.length; i++) {
             if (lines[i].isBlank()) continue;
             Task task = fromString(lines[i]);
-            if (task instanceof Epic) {
-                manager.addEpic((Epic) task);
-            } else if (task instanceof Subtask) {
-                subtasks.add((Subtask) task);
-            } else {
-                manager.addTask(task);
+            switch (task.getType()) {
+                case EPIC:
+                    manager.addEpic((Epic) task);
+                    break;
+                case SUBTASK:
+                    subtasks.add((Subtask) task);
+                    break;
+                default:
+                    manager.addTask(task);
             }
         }
         for (Subtask subtask : subtasks) {
