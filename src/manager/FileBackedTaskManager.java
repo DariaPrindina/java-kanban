@@ -9,6 +9,8 @@ import task.TaskType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         List<String> lines = new ArrayList<>();
-        lines.add("id,type,name,status,description,epic");
+        lines.add("id,type,name,status,description,epic,startTime,duration");
         for (Task task : getAllTasks()) {
             lines.add(taskToString(task));
         }
@@ -44,8 +46,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (task.getType() == TaskType.SUBTASK) {
             epicId = String.valueOf(((Subtask) task).getEpicId());
         }
-        return task.getId() + "," + task.getType() + "," + task.getName() + "," +
-                task.getStatus() + "," + task.getDescription() + "," + epicId;
+        String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
+        String duration = task.getDuration() != null
+                ? String.valueOf(task.getDuration().toMinutes()) : "";
+
+        return task.getId() + "," + task.getType() + "," + task.getName() + ","
+                + task.getStatus() + "," + task.getDescription() + ","
+                + epicId + "," + startTime + "," + duration;
     }
 
     private static Task fromString(String value) {
@@ -70,6 +77,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         task.setId(id);
         task.setStatus(status);
+
+        if (fields.length > 6 && !fields[6].isBlank()) {
+            task.setStartTime(LocalDateTime.parse(fields[6]));
+        }
+        if (fields.length > 7 && !fields[7].isBlank()) {
+            task.setDuration(Duration.ofMinutes(Long.parseLong(fields[7])));
+        }
         return task;
     }
 
@@ -184,43 +198,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
         Task task1 = new Task("Задача 1", "Описание задачи 1");
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 9, 0));
+        task1.setDuration(Duration.ofMinutes(60));
         manager.addTask(task1);
-
-        Task task2 = new Task("Задача 2", "Описание задачи 2");
-        manager.addTask(task2);
 
         Epic epic1 = new Epic("Эпик 1", "Описание эпика 1");
         manager.addEpic(epic1);
 
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId());
+        subtask1.setStartTime(LocalDateTime.of(2024, 1, 1, 11, 0));
+        subtask1.setDuration(Duration.ofMinutes(30));
         manager.addSubtask(subtask1);
-
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId());
-        subtask2.setStatus(Status.DONE);
-        manager.addSubtask(subtask2);
-        manager.updateSubtask(subtask2);
-
-        Epic epic2 = new Epic("Эпик 2 пустой", "Без подзадач");
-        manager.addEpic(epic2);
-
-        System.out.println("=== Исходный менеджер ===");
-        System.out.println("Задачи: " + manager.getAllTasks());
-        System.out.println("Эпики: " + manager.getAllEpics());
-        System.out.println("Подзадачи: " + manager.getAllSubtasks());
 
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(file);
 
-        System.out.println("\n=== Загруженный менеджер ===");
+        System.out.println("=== Загруженный менеджер ===");
         System.out.println("Задачи: " + loaded.getAllTasks());
         System.out.println("Эпики: " + loaded.getAllEpics());
         System.out.println("Подзадачи: " + loaded.getAllSubtasks());
-
-        boolean tasksMatch = manager.getAllTasks().size() == loaded.getAllTasks().size();
-        boolean epicsMatch = manager.getAllEpics().size() == loaded.getAllEpics().size();
-        boolean subtasksMatch = manager.getAllSubtasks().size() == loaded.getAllSubtasks().size();
-
-        System.out.println("\nЗадачи совпадают: " + tasksMatch);
-        System.out.println("Эпики совпадают: " + epicsMatch);
-        System.out.println("Подзадачи совпадают: " + subtasksMatch);
+        System.out.println("По приоритету: " + loaded.getPrioritizedTasks());
     }
 }

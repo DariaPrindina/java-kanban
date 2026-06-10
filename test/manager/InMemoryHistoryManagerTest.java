@@ -18,6 +18,11 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
+    void emptyHistoryShouldReturnEmptyList() {
+        assertTrue(historyManager.getHistory().isEmpty(), "История должна быть пустой");
+    }
+
+    @Test
     void addTaskToHistory() {
         Task task = new Task("Test", "Desc");
         historyManager.add(task);
