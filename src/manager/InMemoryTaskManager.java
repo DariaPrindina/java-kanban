@@ -132,10 +132,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
-        if (task != null) {
-            historyManager.add(task);
+        if (task == null) {
+            throw new NotFoundException("Задача с id=" + id + " не найдена");
         }
-        return task == null ? null : copyTask(task);
+        historyManager.add(task);
+        return copyTask(task);
     }
 
     @Override
@@ -201,10 +202,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpic(int id) {
         Epic epic = epics.get(id);
-        if (epic != null) {
-            historyManager.add(epic);
+        if (epic == null) {
+            throw new NotFoundException("Эпик с id=" + id + " не найден");
         }
-        return epic == null ? null : copyEpic(epic);
+        historyManager.add(epic);
+        return copyEpic(epic);
     }
 
     @Override
@@ -244,7 +246,7 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Subtask> getSubtasksOfEpic(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic == null) {
-            return new ArrayList<>();
+            throw new NotFoundException("Эпик с id=" + epicId + " не найден");
         }
         return epic.getSubtaskIds().stream()
                 .map(subtasks::get)
@@ -275,10 +277,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubtask(int id) {
         Subtask subtask = subtasks.get(id);
-        if (subtask != null) {
-            historyManager.add(subtask);
+        if (subtask == null) {
+            throw new NotFoundException("Подзадача с id=" + id + " не найдена");
         }
-        return subtask == null ? null : copySubtask(subtask);
+        historyManager.add(subtask);
+        return copySubtask(subtask);
     }
 
     @Override
