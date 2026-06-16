@@ -8,33 +8,33 @@ import java.nio.charset.StandardCharsets;
 
 public class BaseHttpHandler {
 
-    protected void sendText(HttpExchange h, String text, int code) throws IOException {
+    protected void sendText(HttpExchange h, String text, HttpStatusCode statusCode) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        h.sendResponseHeaders(code, resp.length);
+        h.sendResponseHeaders(statusCode.getCode(), resp.length);
         h.getResponseBody().write(resp);
         h.close();
     }
 
     protected void sendText(HttpExchange h, String text) throws IOException {
-        sendText(h, text, 200);
+        sendText(h, text, HttpStatusCode.OK);
     }
 
     protected void sendCreated(HttpExchange h) throws IOException {
-        h.sendResponseHeaders(201, -1);
+        h.sendResponseHeaders(HttpStatusCode.CREATED.getCode(), -1);
         h.close();
     }
 
     protected void sendNotFound(HttpExchange h, String message) throws IOException {
-        sendText(h, "{\"error\":\"" + message + "\"}", 404);
+        sendText(h, "{\"error\":\"" + message + "\"}", HttpStatusCode.NOT_FOUND);
     }
 
     protected void sendHasInteractions(HttpExchange h) throws IOException {
-        sendText(h, "{\"error\":\"Задача пересекается по времени с существующей\"}", 406);
+        sendText(h, "{\"error\":\"Задача пересекается по времени с существующей\"}", HttpStatusCode.NOT_ACCEPTABLE);
     }
 
     protected void sendInternalError(HttpExchange h, String message) throws IOException {
-        sendText(h, "{\"error\":\"" + message + "\"}", 500);
+        sendText(h, "{\"error\":\"" + message + "\"}", HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 
     protected String readBody(HttpExchange h) throws IOException {
