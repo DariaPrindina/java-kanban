@@ -47,7 +47,7 @@ class HttpTaskManagerPrioritizedTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertEquals("[]", response.body());
     }
 
@@ -68,7 +68,7 @@ class HttpTaskManagerPrioritizedTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         int earlyIdx = response.body().indexOf("EarlyTask");
         int lateIdx = response.body().indexOf("LateTask");
         assertTrue(earlyIdx < lateIdx, "EarlyTask должна идти первой в prioritized");

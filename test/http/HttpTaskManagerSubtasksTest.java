@@ -48,7 +48,7 @@ class HttpTaskManagerSubtasksTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertEquals("[]", response.body());
     }
 
@@ -67,7 +67,7 @@ class HttpTaskManagerSubtasksTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatusCode.CREATED.getCode(), response.statusCode());
         assertEquals(1, manager.getAllSubtasks().size());
         assertEquals("SubTest", manager.getAllSubtasks().get(0).getName());
     }
@@ -79,7 +79,7 @@ class HttpTaskManagerSubtasksTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(404, response.statusCode());
+        assertEquals(HttpStatusCode.NOT_FOUND.getCode(), response.statusCode());
     }
 
     @Test
@@ -94,7 +94,7 @@ class HttpTaskManagerSubtasksTest {
                 .DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(manager.getAllSubtasks().isEmpty());
     }
 
@@ -118,6 +118,6 @@ class HttpTaskManagerSubtasksTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(406, response.statusCode());
+        assertEquals(HttpStatusCode.NOT_ACCEPTABLE.getCode(), response.statusCode());
     }
 }

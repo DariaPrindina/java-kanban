@@ -48,7 +48,7 @@ class HttpTaskManagerTasksTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertEquals("[]", response.body());
     }
 
@@ -64,7 +64,7 @@ class HttpTaskManagerTasksTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatusCode.CREATED.getCode(), response.statusCode());
         List<Task> tasks = manager.getAllTasks();
         assertEquals(1, tasks.size());
         assertEquals("Test task", tasks.get(0).getName());
@@ -80,7 +80,7 @@ class HttpTaskManagerTasksTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(response.body().contains("ByIdTask"));
     }
 
@@ -91,7 +91,7 @@ class HttpTaskManagerTasksTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(404, response.statusCode());
+        assertEquals(HttpStatusCode.NOT_FOUND.getCode(), response.statusCode());
     }
 
     @Test
@@ -106,7 +106,7 @@ class HttpTaskManagerTasksTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatusCode.CREATED.getCode(), response.statusCode());
         assertEquals("NewName", manager.getTask(task.getId()).getName());
     }
 
@@ -120,7 +120,7 @@ class HttpTaskManagerTasksTest {
                 .DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(manager.getAllTasks().isEmpty());
     }
 
@@ -141,6 +141,6 @@ class HttpTaskManagerTasksTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(406, response.statusCode());
+        assertEquals(HttpStatusCode.NOT_ACCEPTABLE.getCode(), response.statusCode());
     }
 }

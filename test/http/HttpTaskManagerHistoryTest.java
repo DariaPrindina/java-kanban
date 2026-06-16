@@ -45,7 +45,7 @@ class HttpTaskManagerHistoryTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertEquals("[]", response.body());
     }
 
@@ -60,7 +60,7 @@ class HttpTaskManagerHistoryTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(response.body().contains("HistoryTask"));
     }
 }

@@ -46,7 +46,7 @@ class HttpTaskManagerEpicsTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertEquals("[]", response.body());
     }
 
@@ -60,7 +60,7 @@ class HttpTaskManagerEpicsTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatusCode.CREATED.getCode(), response.statusCode());
         assertEquals(1, manager.getAllEpics().size());
         assertEquals("EpicTest", manager.getAllEpics().get(0).getName());
     }
@@ -75,7 +75,7 @@ class HttpTaskManagerEpicsTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(response.body().contains("ByIdEpic"));
     }
 
@@ -86,7 +86,7 @@ class HttpTaskManagerEpicsTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(404, response.statusCode());
+        assertEquals(HttpStatusCode.NOT_FOUND.getCode(), response.statusCode());
     }
 
     @Test
@@ -100,7 +100,7 @@ class HttpTaskManagerEpicsTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(response.body().contains("Sub"));
     }
 
@@ -111,7 +111,7 @@ class HttpTaskManagerEpicsTest {
                 .GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(404, response.statusCode());
+        assertEquals(HttpStatusCode.NOT_FOUND.getCode(), response.statusCode());
     }
 
     @Test
@@ -124,7 +124,7 @@ class HttpTaskManagerEpicsTest {
                 .DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(HttpStatusCode.OK.getCode(), response.statusCode());
         assertTrue(manager.getAllEpics().isEmpty());
     }
 }
